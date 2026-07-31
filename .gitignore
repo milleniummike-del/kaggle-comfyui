@@ -1,0 +1,81 @@
+# ============================================================================
+# Kaggle_Workspace_FreeGPU — ветка `main`
+# ТОЛЬКО установочные скрипты ComfyUI для Kaggle + workflow + блокноты.
+# Сайт проекта живёт в ветке `site` (React/Vite), здесь его быть не должно.
+# ============================================================================
+
+# --- Секреты (КРИТИЧНО: токены/учётки никогда не уходят на GitHub) ---
+.env
+.env.*
+.env.txt
+*.token
+*credentials*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# --- ComfyUI runtime / окружение Kaggle (ставится скриптами, не хранится) ---
+venv/
+.venv/
+ComfyUI/
+cloudflared
+bin/
+uv-python/
+uv-cache/
+*.log
+req.txt
+pinggy.py
+
+# --- Блокноты в КОРНЕ — только локально ---
+# В папках workflows/ и Notebook/ — публичные примеры (коммитятся).
+.ipynb_checkpoints/
+/*.ipynb
+
+# --- Локальные тесты и драйверы Kaggle (токены, временные скрипты) ---
+_kaggle_tests/
+
+# --- Сторонние/смежные проекты, заметки и IDE-папки (живут отдельно) ---
+angel-ui/
+Claude Code Docs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Локальная память проекта и инструкции для агентов (не для GitHub) ---
+PROJECT_MEMORY.md
+instal/docs/
+**/AGENTS.md
+
+# --- Сайт (React/Vite) живёт в ветке `site`, здесь ему не место.
+# Если случайно окажется в main — игнорируем, чтобы не закоммитить лишнего.
+src/
+public/
+index.html
+package.json
+package-lock.json
+tsconfig.json
+tsconfig.node.json
+vite.config.ts
+docs-site/
+.github/
+
+# --- Локальные state-файлы Jupyter-style tooling ---
+.jbase
+.jkid
+
+# --- Vite / Node.js артефакты (если случайно зашли — игнорируем) ---
+node_modules/
+dist/
+docs-site/dist/
+.vite/
+SageAttention-SM75-path/
+
+
+# --- Playwright browser test artifacts ---
+.playwright-mcp/
+kaggle-session-check*.json
+console-*.log
