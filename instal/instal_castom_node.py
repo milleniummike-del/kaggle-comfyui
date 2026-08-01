@@ -55,6 +55,8 @@ CUSTOM_NODES = {
     # LTX2 MultiGPU — author node by THE-ANGEL-AI.
     # Custom-built from scratch: Hybrid Split Loader for LTX 2.3 GGUF on 2×T4 (Kaggle).
     "ComfyUI-LTX2-MultiGPU": "https://github.com/THE-ANGEL-AI/ComfyUI-LTX2-MultiGPU.git",
+    # FileManaty — in-browser file manager for ComfyUI.
+    "ComfyUI-FileManaty":  "https://github.com/agarzon/ComfyUI-FileManaty.git",
 }
 
 # Z Image Turbo AIO — from Kaggle dataset (symlink, no download).
@@ -69,10 +71,6 @@ ZPOP_MODEL_DST = f"{COMFY_DIR}/models/checkpoints/gonzalomoZpop_v40.safetensors"
 SYMLINKS = [
     # Z Image Turbo AIO
     (ZPOP_MODEL_SRC, ZPOP_MODEL_DST),
-
-    # LoadLora model from Kaggle dataset
-    ("/kaggle/input/datasets/martasteiner/loadlora/model.safetensors",
-     f"{COMFY_DIR}/models/loras/loadlora_model.safetensors")
 ]
 
 
@@ -81,6 +79,41 @@ def uv_pip_install_req(req_path):
     result = run(["uv", "pip", "install", "--python", VENV_PYTHON, "-r", req_path], check=False)
     if result and result.returncode != 0:
         warn(f"Failed to install node requirements: {req_path}")
+
+
+def setup_filemanaty_config():
+    """Creates config.json for ComfyUI-FileManaty to mount comfyui/models."""
+    import json
+    fm_dir = os.path.join(NODES_DIR, "ComfyUI-FileManaty")
+    config_path = os.path.join(fm_dir, "config.json")
+    if not os.path.isdir(fm_dir):
+        warn("ComfyUI-FileManaty not installed — skipping config")
+        return
+    config = {
+        "roots": [
+            {
+                "id": "models",
+                "label": "Models",
+                "path": f"{COMFY_DIR}/models",
+                "writable": True
+            },
+            {
+                "id": "output",
+                "label": "Output",
+                "path": f"{COMFY_DIR}/output",
+                "writable": True
+            },
+            {
+                "id": "input",
+                "label": "Input",
+                "path": f"{COMFY_DIR}/input",
+                "writable": True
+            }
+        ]
+    }
+    with open(config_path, "w") as f:
+        json.dump(config, f, indent=2)
+    log(f"FileManaty config created: {config_path}")
 
 
 def check_prerequisites():
@@ -178,6 +211,9 @@ def main():
     step("Model symlinks")
     for src, dst in SYMLINKS:
         make_symlink(src, dst)
+
+    step("FileManaty config")
+    setup_filemanaty_config()
 
     log("DONE. Nodes and models in place. Now run: %run instal/start.py")
     # SageAttention-T4 workflow injection happens later in start.py (after symlink creation)
