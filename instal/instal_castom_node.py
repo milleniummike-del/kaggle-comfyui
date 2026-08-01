@@ -199,6 +199,26 @@ def inject_sageattn_into_workflows():
     run([sys.executable, injector, workflows_dir], check=False)
 
 
+def copy_workflows():
+    """Copies workflow JSONs from repo's workflows/ to ComfyUI user workflows."""
+    import shutil
+    repo_workflows = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'workflows')
+    comfy_workflows = os.path.join(COMFY_DIR, 'user', 'default', 'workflows')
+    if not os.path.isdir(repo_workflows):
+        warn(f'Repo workflows folder not found: {repo_workflows}')
+        return
+    os.makedirs(comfy_workflows, exist_ok=True)
+    copied = 0
+    for f in os.listdir(repo_workflows):
+        if f.endswith('.json'):
+            src = os.path.join(repo_workflows, f)
+            dst = os.path.join(comfy_workflows, f)
+            shutil.copy2(src, dst)
+            log(f'Workflow: {f}')
+            copied += 1
+    log(f'Copied {copied} workflows to ComfyUI')
+
+
 def main():
     step("STEP 2: custom nodes + model links")
 
@@ -214,6 +234,9 @@ def main():
 
     step("FileManaty config")
     setup_filemanaty_config()
+
+    step("Copy workflows")
+    copy_workflows()
 
     log("DONE. Nodes and models in place. Now run: %run instal/start.py")
     # SageAttention-T4 workflow injection happens later in start.py (after symlink creation)
